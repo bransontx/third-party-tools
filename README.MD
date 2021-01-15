@@ -226,7 +226,7 @@ boolean PaymentUtils.verifySignature(HttpServletRequest request, String publicKe
   * @param tradeType 支付类型 {@link TradeType}
   * @return 返回参数 {@link CallbackParams}
   */
-static CallbackParams getCallbackParams(TradeType tradeType, String wxApiKey, String aliPublicKey , HttpServletRequest request)
+CallbackParams getCallbackParams(TradeType tradeType, String wxApiKey, String aliPublicKey , HttpServletRequest request)
 ```
 
 ###### 微信工具
