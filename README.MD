@@ -1,43 +1,144 @@
 ### 第三方工具类
 
-###### 说明：一下功能已全部实现,需要请联系作者: qq1969696789
+###### 实现功能：
+
+- 第三方登录
+    1. 微信
+    2. 支付宝
+    3. Apple
+- 第三方支付
+    1. 微信
+    2. 支付宝
+    3. Apple
+- 短信
+    1. 阿里云
+- OSS
+    1. 阿里云
+
+需要依赖：
+
 ```
-实现了微信、支付宝、Apple的支付和登录、阿里云短信验证码
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>commons-codec</groupId>
+    <artifactId>commons-codec</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>fastjson</artifactId>
+    <version>1.2.75</version>
+</dependency>
+
+
+支付宝依赖、短信依赖
+<dependency>
+    <groupId>com.alipay.sdk</groupId>
+    <artifactId>alipay-sdk-java</artifactId>
+    <version>4.10.192.ALL</version>
+    <scope>provided</scope>
+    <exclusions>
+        <exclusion>
+            <artifactId>fastjson</artifactId>
+            <groupId>com.alibaba</groupId>
+        </exclusion>
+        <exclusion>
+            <artifactId>commons-logging</artifactId>
+            <groupId>commons-logging</groupId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<dependency>
+    <groupId>com.aliyun</groupId>
+    <artifactId>aliyun-java-sdk-core</artifactId>
+    <version>4.4.6</version>
+    <scope>provided</scope>
+    <exclusions>
+        <exclusion>
+            <artifactId>commons-logging</artifactId>
+            <groupId>commons-logging</groupId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+微信依赖
+<dependency>
+    <groupId>org.jdom</groupId>
+    <artifactId>jdom2</artifactId>
+    <version>2.0.6</version>
+</dependency>
+
+苹果登录依赖
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt</artifactId>
+    <version>0.9.1</version>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>com.auth0</groupId>
+    <artifactId>jwks-rsa</artifactId>
+    <version>0.9.0</version>
+    <scope>provided</scope>
+</dependency>
 ```
+
+
+
+
+
 ##### 配置类（com.gf.tools.config.ToolsProp）
 
 ```java
 /*支付宝配置*/
-private String AliAppId;
+String aliAppId;
 
-private String AliPublicKey;
+String aliPublicKey;
 
-private String AliPrivateKey;
+String aliPrivateKey;
 
-private String AliGetWay;
+String aliGetWay;
 /*支付宝配置*/
 
 /*短信配置*/
-private String SmsAccessKeyId;
+String accessKeyId;
 
-private String SmsSecret;
+String accessKeySecret;
 
-private String SmsRegionId;
+String smsRegionId;
 
-private String SmsSignName;
+String smsSignName;
 /*短信配置*/
 
 /*微信支付*/
-private String WxAppId;
+String wxAppId;
 
-private String WxApiKey;
+String wxApiKey;
 
-private String WxMchId;
+String wxMchId;
 
-private String WxAppSecret;
+String wxAppSecret;
 
-private String WxPayUrl;
+String wxPayUrl;
 /*微信支付*/
+
+/*OSS*/
+private String ossEndpoint;
+// 为空默认取 accessKeyId
+private String ossAccessKeyId;
+// 为空默认取 accessKeySecret
+private String ossAccessKeySecret;
+/*OSS*/
 ```
 
 ##### payment 支付模块(com.gf.tools.payment.base.Payment)
@@ -184,7 +285,66 @@ public void testGet(){
 }
 ```
 
+##### OSS工具
 
+```
+引入MAVEN
+<dependency>
+    <groupId>com.aliyun.oss</groupId>
+    <artifactId>aliyun-sdk-oss</artifactId>
+    <version>3.8.0</version>
+</dependency>
+
+获取实例：OSSClientUtil.getInstance(ToolsProp toolsProp)
+
+/**
+* 获取阿里云OSS客户端对象
+* @return ossClient
+*/
+OSSClient getOSSClient()
+
+/**
+* 创建存储空间
+* @param ossClient OSS连接
+* @param bucketName 存储空间
+*/
+String createBucketName(OSSClient ossClient, String bucketName)
+
+/**
+* 删除存储空间buckName
+* @param ossClient oss对象
+* @param bucketName 存储空间
+*/
+void deleteBucket(OSSClient ossClient, String bucketName)
+
+/**
+* 创建模拟文件夹
+* @param ossClient oss连接
+* @param bucketName 存储空间
+* @param folder 文件夹
+* @return 文件夹名
+*/
+String createFolder(OSSClient ossClient, String bucketName, String folder)
+
+/**
+* 根据key删除OSS服务器上的文件
+* @param ossClient oss连接
+* @param bucketName 存储空间
+* @param folder 文件夹名 如"folder/"
+* @param pathFileName Bucket下的文件的路径名+文件名 如："images/girl.jpg"
+*/
+void deleteFile(OSSClient ossClient, String bucketName, String folder, String pathFileName)
+
+/**
+* 上传图片至OSS
+* @param ossClient oss连接
+* @param file 上传文件（文件全路径如：/home/users/images/girl.jpg）
+* @param bucketName 存储空间
+* @param folder 文件夹名 如"images/"
+* @return String 唯一MD5数字签名
+*/
+String uploadObject2OSS(OSSClient ossClient, File file, String bucketName, String folder)
+```
 
 ##### 其他方法
 
@@ -226,7 +386,7 @@ boolean PaymentUtils.verifySignature(HttpServletRequest request, String publicKe
   * @param tradeType 支付类型 {@link TradeType}
   * @return 返回参数 {@link CallbackParams}
   */
-CallbackParams getCallbackParams(TradeType tradeType, String wxApiKey, String aliPublicKey , HttpServletRequest request)
+static CallbackParams getCallbackParams(TradeType tradeType, String wxApiKey, String aliPublicKey , HttpServletRequest request)
 ```
 
 ###### 微信工具
